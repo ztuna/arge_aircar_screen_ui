@@ -13,16 +13,17 @@ from PyQt5.QtGui import *
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
 
-from widget.battery.RadialBar import RadialBar
 from widget.compass import CompassWidget
-from widget.battery.BatteryWidget import BatteryWidget
+from widget.battery import BatteryWidget
 from widget.speed import SpeedWidget
 from widget.attitude import AttitudeWidget
 from widget.altimeter import AltimeterWidget
 from widget.variometer import VariometerWidget
 from widget.turn   import TurnWidget
+from widget.flight_duration import fDurationWidget
 
 class GUI_MainWindow(QtWidgets.QMainWindow):
+    os.chdir(os.path.dirname(os.path.realpath("during_flight")))       
     def __init__(self, parent=None):
         super().__init__() 
         screenSize = QtWidgets.QDesktopWidget().screenGeometry(-1)
@@ -30,11 +31,10 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet("background-color: white")
         
         self.iteration=0
-        self.batterySize=100
+        self.batterySize=100        
         self.speedSize=0
         self.latVal = 0
         self.lngVal = 0
-        self.battery = BatteryWidget()
         self.f=open('vehicle_gps_position.csv','r')
 
         self.lat   = []
@@ -54,36 +54,36 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         palette.setColor(palette.Background, QtGui.QColor(255, 255, 255))
         
         # 0,0 = flight duration        
-        attitudeTitle = QLabel()
-        attitudeTitle.setObjectName("Attitude Title")
-        attitudeTitle.setText("Attitude Indicator")
-        font  = attitudeTitle.font()
+        durationTitle = QLabel()
+        durationTitle.setObjectName("Duration Title")
+        durationTitle.setText("Flight Duration")
+        font  = durationTitle.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(20)    
-        attitudeTitle.setFont(font)
-        attitudeTitle.setPalette(palette)
-        attitudeTitle.setAlignment(Qt.AlignCenter)
+        durationTitle.setFont(font)
+        durationTitle.setPalette(palette)
+        durationTitle.setAlignment(Qt.AlignCenter)
 
-        self.attitudeIcon = AttitudeWidget.Attitude(self)
-        self.attitudeIcon.setObjectName("Attitude Icon")
-        self.attitudeIcon.reinit() 
+        self.durationIcon = fDurationWidget.fDuration(self)
+        self.durationIcon.setObjectName("Duration Icon")
+        self.durationIcon.reinit() 
         
-        self.attitudeValue = QLabel()
-        self.attitudeValue.setObjectName("Attitude Value")
-        self.attitudeValue.setText(str(1.0))
-        font  = self.attitudeValue.font()
+        self.durationValue = QLabel()
+        self.durationValue.setObjectName("Attitude Value")
+        self.durationValue.setText("0:0:1")
+        font  = self.durationValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
-        self.attitudeValue.setFont(font)
-        self.attitudeValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
-        self.attitudeValue.setAlignment(Qt.AlignCenter)        
+        self.durationValue.setFont(font)
+        self.durationValue.setStyleSheet("QLabel { background-color: \
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
+        self.durationValue.setAlignment(Qt.AlignCenter)        
         
         groupBox1 = QGroupBox()        
         vbox1 = QVBoxLayout()  
-        vbox1.addWidget(attitudeTitle)
-        vbox1.addWidget(self.attitudeIcon)
-        vbox1.addWidget(self.attitudeValue)
+        vbox1.addWidget(durationTitle)
+        vbox1.addWidget(self.durationIcon)
+        vbox1.addWidget(self.durationValue)
         vbox1.addStretch(1)
         groupBox1.setLayout(vbox1)
         groupBox1.setStyleSheet("QGroupBox { background-color: \
@@ -112,7 +112,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.speedValue.setFont(font)
         self.speedValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.speedValue.setAlignment(Qt.AlignCenter)        
         
         groupBox2 = QGroupBox()        
@@ -148,7 +148,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.attitudeValue.setFont(font)
         self.attitudeValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.attitudeValue.setAlignment(Qt.AlignCenter)                
         
         groupBox3 = QGroupBox()        
@@ -184,7 +184,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.altimeterValue.setFont(font)
         self.altimeterValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.altimeterValue.setAlignment(Qt.AlignCenter)  
     
         groupBox4 = QGroupBox()        
@@ -207,24 +207,21 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         batteryTitle.setFont(font)
         batteryTitle.setPalette(palette) 
         batteryTitle.setAlignment(Qt.AlignCenter)        
-
-        self.batteryIcon = QtQuickWidgets.QQuickWidget(self)
+        
+        self.batteryIcon = BatteryWidget.Battery(self)
         self.batteryIcon.setObjectName("Battery Icon")
-        #batteryWidget = BatteryWidget() # Class with function to update data in QML
-        #context = self.batteryIcon.rootContext()
-        #context.setContextProperty("batteryWidget",batteryWidget)
-        #self.batteryIcon.setSource(QtCore.QUrl.fromLocalFile('widget/battery/qml_widget.qml'))
+        self.batteryIcon.reinit()        
         
         self.batteryValue = QLabel()
         self.batteryValue.setObjectName("Attitude Value")
-        self.batteryValue.setText(str(100.0))
+        self.batteryValue.setText(str(self.batterySize))
         font  = self.batteryValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
         self.batteryValue.setFont(font)
         self.batteryValue.setAlignment(Qt.AlignCenter)
         self.batteryValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
     
         groupBox5 = QGroupBox()   
         vbox5 = QVBoxLayout()
@@ -259,7 +256,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.turnSlipValue.setFont(font)
         self.turnSlipValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.turnSlipValue.setAlignment(Qt.AlignCenter)  
         
         groupBox6 = QGroupBox()        
@@ -295,7 +292,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.headingValue.setFont(font)
         self.headingValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.headingValue.setAlignment(Qt.AlignCenter)  
         
         groupBox7 = QGroupBox()        
@@ -331,7 +328,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         font.setPointSize(25)    
         self.variometerValue.setFont(font)
         self.variometerValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); text-color: rgb(255, 255, 255); }")
+        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.variometerValue.setAlignment(Qt.AlignCenter)  
 
         groupBox8 = QGroupBox()                
@@ -381,8 +378,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         if self.batterySize < 0:
             self.batterySize = 100
         if self.speedSize > 16:
-            self.speedSize = 0
-
+            self.speedSize = 0   
+    
         self.headingIcon.setHeading(30)
         self.speedIcon.setSpeed(12)        
         self.altimeterIcon.setAltitude(self.alt[self.iteration])
@@ -391,23 +388,37 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.variometerIcon.setClimbRate(100)
         self.turnSlipIcon.setTurnRate(10*math.cos(45))
         self.turnSlipIcon.setSlipSkid(10*math.cos(45))
-                
+        self.durationIcon.setHour(self.timerEvent().hour())
+        self.durationIcon.setMin(self.timerEvent().minute())
+        self.durationIcon.setSec(self.timerEvent().second())
+        self.batteryIcon.setCurrentVal(self.batterySize)
+    
+    
         self.headingIcon.viewUpdate.emit()
         self.speedIcon.viewUpdate.emit()
         self.altimeterIcon.viewUpdate.emit()
         self.attitudeIcon.viewUpdate.emit()
         self.variometerIcon.viewUpdate.emit()
         self.turnSlipIcon.viewUpdate.emit()
-
+        self.durationIcon.viewUpdate.emit()
+        self.batteryIcon.viewUpdate.emit()
+    
+    
         self.attitudeValue.setText(str(45))
         self.speedValue.setText(str(12))
-        self.batteryValue.setText(str(self.batterySize))
+        self.batteryValue.setText(str(self.batterySize) + "%")
         self.altimeterValue.setText(str(self.alt[self.iteration]))
         self.variometerValue.setText(str(100))
         self.turnSlipValue.setText(str(10*math.cos(45)))
         self.headingValue.setText(str(30))
+        self.durationValue.setText(self.timerEvent().toString("hh:mm:ss"))
 
         self.LogPrint()
+        
+    def timerEvent(self):
+        global time
+        time = time.addSecs(1)
+        return time
         
     def getTime(self):
         now = time.localtime()
@@ -441,16 +452,11 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
 window = GUI_MainWindow()    #Main window written in pyqt5
 
-#Battery Widget
-QtQml.qmlRegisterType(RadialBar, "SDK", 1,0, "RadialBar")
-batteryWidget = BatteryWidget() # Class with function to update data in QML
-context = window.batteryIcon.rootContext()
-context.setContextProperty("batteryWidget", batteryWidget)
-window.batteryIcon.setSource(QtCore.QUrl.fromLocalFile('widget/battery/qml_widget.qml'))
+timer = QtCore.QTimer()
+time = QtCore.QTime(0, 0, 0)
+timer.timeout.connect(window.timerEvent)
+timer.start(200)
 
-timer = QtCore.QTimer() 
-timer.timeout.connect(batteryWidget.current_value)
-timer.start(1000)
 timer2 = QtCore.QTimer()
 timer2.timeout.connect(window.setViewWidget)
 timer2.start(200)
