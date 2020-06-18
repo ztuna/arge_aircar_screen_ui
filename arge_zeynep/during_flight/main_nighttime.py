@@ -30,16 +30,21 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.resize(screenSize.width(), screenSize.height())
         self.setStyleSheet("background-color: black")
         
-        self.iteration=0
-        self.batterySize=100        
-        self.speedSize=0
+        self.iteration = 0
+        self.batterySize = 100        
+        self.speedSize = 0
         self.latVal = 0
         self.lngVal = 0
-        self.f=open('vehicle_gps_position.csv','r')
+        self.f = open('vehicle_gps_position_2.csv','r')
+        self.h = open('vehicle_attitude.csv','r')
 
         self.lat   = []
         self.lon   = []
         self.alt   = []
+        self.speed = []
+        self.vspeed = []
+        self.roll = []
+        self.pitch = []
         self.dataReader()        
         
         self.centralWidget = QtWidgets.QWidget(self)
@@ -53,7 +58,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         palette.setColor(palette.Background, QtGui.QColor(0, 0, 0))
         palette.setColor(palette.WindowText, QtGui.QColor(255, 255, 255))
         
-        # 0,0 = flight duration        
+        # 0,0 = Flight Duration Indicator       
         durationTitle = QLabel()
         durationTitle.setObjectName("Duration Title")
         durationTitle.setText("Flight Duration")
@@ -69,8 +74,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.durationIcon.reinit() 
         
         self.durationValue = QLabel()
-        self.durationValue.setObjectName("Attitude Value")
-        self.durationValue.setText("0:0:1")
+        self.durationValue.setObjectName("Duration Value")
+        self.durationValue.setText("00:00:01")
         font  = self.durationValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -79,14 +84,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.durationValue.setAlignment(Qt.AlignCenter)        
         
-        groupBox1 = QGroupBox()        
-        vbox1 = QVBoxLayout()  
-        vbox1.addWidget(durationTitle)
-        vbox1.addWidget(self.durationIcon)
-        vbox1.addWidget(self.durationValue)
-        vbox1.addStretch(1)
-        groupBox1.setLayout(vbox1)
-        groupBox1.setStyleSheet("QGroupBox { background-color: \
+        duration = QGroupBox()        
+        durationLayout = QVBoxLayout()  
+        durationLayout.addWidget(durationTitle)
+        durationLayout.addWidget(self.durationIcon)
+        durationLayout.addWidget(self.durationValue)
+        durationLayout.addStretch(1)
+        duration.setLayout(durationLayout)
+        duration.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
         
         # 0,1 = Air Speed Indicator
@@ -106,7 +111,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.speedValue = QLabel()
         self.speedValue.setObjectName("Speed Value")
-        self.speedValue.setText(str(2.0))
+        self.speedValue.setText(str(0.0))
         font  = self.speedValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -115,14 +120,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.speedValue.setAlignment(Qt.AlignCenter)        
         
-        groupBox2 = QGroupBox()        
-        vbox2 = QVBoxLayout()
-        vbox2.addWidget(speedTitle)
-        vbox2.addWidget(self.speedIcon)
-        vbox2.addWidget(self.speedValue)
-        vbox2.addStretch(1)
-        groupBox2.setLayout(vbox2)
-        groupBox2.setStyleSheet("QGroupBox { background-color: \
+        speed = QGroupBox()        
+        speedLayout = QVBoxLayout()
+        speedLayout.addWidget(speedTitle)
+        speedLayout.addWidget(self.speedIcon)
+        speedLayout.addWidget(self.speedValue)
+        speedLayout.addStretch(1)
+        speed.setLayout(speedLayout)
+        speed.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")       
         
         # 0,2 = Attitude Indicator
@@ -142,7 +147,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.attitudeValue = QLabel()
         self.attitudeValue.setObjectName("Attitude Value")
-        self.attitudeValue.setText(str(1.0))
+        self.attitudeValue.setText(str(0.0))
         font  = self.attitudeValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -151,14 +156,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.attitudeValue.setAlignment(Qt.AlignCenter)                
         
-        groupBox3 = QGroupBox()        
-        vbox3 = QVBoxLayout()
-        vbox3.addWidget(attitudeTitle)
-        vbox3.addWidget(self.attitudeIcon)
-        vbox3.addWidget(self.attitudeValue)
-        vbox3.addStretch(1)
-        groupBox3.setLayout(vbox3)
-        groupBox3.setStyleSheet("QGroupBox { background-color: \
+        attitude = QGroupBox()        
+        attitudeLayout = QVBoxLayout()
+        attitudeLayout.addWidget(attitudeTitle)
+        attitudeLayout.addWidget(self.attitudeIcon)
+        attitudeLayout.addWidget(self.attitudeValue)
+        attitudeLayout.addStretch(1)
+        attitude.setLayout(attitudeLayout)
+        attitude.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
         
         # 0,3 = Altimeter
@@ -178,7 +183,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.altimeterValue = QLabel()
         self.altimeterValue.setObjectName("Attitude Value")
-        self.altimeterValue.setText(str(1.0))
+        self.altimeterValue.setText(str(0.0))
         font  = self.altimeterValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -187,14 +192,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.altimeterValue.setAlignment(Qt.AlignCenter)  
     
-        groupBox4 = QGroupBox()        
-        vbox4 = QVBoxLayout()
-        vbox4.addWidget(altimeterTitle)
-        vbox4.addWidget(self.altimeterIcon)
-        vbox4.addWidget(self.altimeterValue)
-        vbox4.addStretch(1)
-        groupBox4.setLayout(vbox4)
-        groupBox4.setStyleSheet("QGroupBox { background-color: \
+        altimeter = QGroupBox()        
+        altimeterLayout = QVBoxLayout()
+        altimeterLayout.addWidget(altimeterTitle)
+        altimeterLayout.addWidget(self.altimeterIcon)
+        altimeterLayout.addWidget(self.altimeterValue)
+        altimeterLayout.addStretch(1)
+        altimeter.setLayout(altimeterLayout)
+        altimeter.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
 
         # 1,0 = Remaining Battery
@@ -223,14 +228,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.batteryValue.setStyleSheet("QLabel { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
     
-        groupBox5 = QGroupBox()   
-        vbox5 = QVBoxLayout()
-        vbox5.addWidget(batteryTitle)
-        vbox5.addWidget(self.batteryIcon)
-        vbox5.addWidget(self.batteryValue)
-        vbox5.addStretch(1)
-        groupBox5.setLayout(vbox5)
-        groupBox5.setStyleSheet("QGroupBox { background-color: \
+        battery = QGroupBox()   
+        batteryLayout = QVBoxLayout()
+        batteryLayout.addWidget(batteryTitle)
+        batteryLayout.addWidget(self.batteryIcon)
+        batteryLayout.addWidget(self.batteryValue)
+        batteryLayout.addStretch(1)
+        battery.setLayout(batteryLayout)
+        battery.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")            
                 
         # 1,1 = Turn and Slip Indicator
@@ -250,7 +255,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.turnSlipValue = QLabel()
         self.turnSlipValue.setObjectName("Attitude Value")
-        self.turnSlipValue.setText(str(1.0))
+        self.turnSlipValue.setText(str(0.0))
         font  = self.turnSlipValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -259,14 +264,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.turnSlipValue.setAlignment(Qt.AlignCenter)  
         
-        groupBox6 = QGroupBox()        
-        vbox6 = QVBoxLayout()
-        vbox6.addWidget(turnSlipTitle)
-        vbox6.addWidget(self.turnSlipIcon)
-        vbox6.addWidget(self.turnSlipValue)
-        vbox6.addStretch(1)
-        groupBox6.setLayout(vbox6)
-        groupBox6.setStyleSheet("QGroupBox { background-color: \
+        turnSlip = QGroupBox()        
+        turnSlipLayout = QVBoxLayout()
+        turnSlipLayout.addWidget(turnSlipTitle)
+        turnSlipLayout.addWidget(self.turnSlipIcon)
+        turnSlipLayout.addWidget(self.turnSlipValue)
+        turnSlipLayout.addStretch(1)
+        turnSlip.setLayout(turnSlipLayout)
+        turnSlip.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")         
         
         # 1,2 = Heading Indicator
@@ -286,7 +291,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.headingValue = QLabel()
         self.headingValue.setObjectName("Attitude Value")
-        self.headingValue.setText(str(1.0))
+        self.headingValue.setText(str(0.0))
         font  = self.headingValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -295,14 +300,14 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.headingValue.setAlignment(Qt.AlignCenter)  
         
-        groupBox7 = QGroupBox()        
-        vbox7 = QVBoxLayout()
-        vbox7.addWidget(headingTitle)
-        vbox7.addWidget(self.headingIcon)
-        vbox7.addWidget(self.headingValue)
-        vbox7.addStretch(1)
-        groupBox7.setLayout(vbox7)
-        groupBox7.setStyleSheet("QGroupBox { background-color: \
+        heading = QGroupBox()        
+        headingLayout = QVBoxLayout()
+        headingLayout.addWidget(headingTitle)
+        headingLayout.addWidget(self.headingIcon)
+        headingLayout.addWidget(self.headingValue)
+        headingLayout.addStretch(1)
+        heading.setLayout(headingLayout)
+        heading.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")          
         
         # 1,3 = Variometer
@@ -331,25 +336,25 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
         self.variometerValue.setAlignment(Qt.AlignCenter)  
 
-        groupBox8 = QGroupBox()                
-        vbox8 = QVBoxLayout()
-        vbox8.addWidget(variometerTitle)
-        vbox8.addWidget(self.variometerIcon)
-        vbox8.addWidget(self.variometerValue)
-        vbox8.addStretch(1)
-        groupBox8.setLayout(vbox8)
-        groupBox8.setStyleSheet("QGroupBox { background-color: \
+        variometer = QGroupBox()                
+        variometerLayout = QVBoxLayout()
+        variometerLayout.addWidget(variometerTitle)
+        variometerLayout.addWidget(self.variometerIcon)
+        variometerLayout.addWidget(self.variometerValue)
+        variometerLayout.addStretch(1)
+        variometer.setLayout(variometerLayout)
+        variometer.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
         
         grid = QGridLayout()
-        grid.addWidget(groupBox1, 0, 0)
-        grid.addWidget(groupBox2, 0, 1)
-        grid.addWidget(groupBox3, 0, 2)
-        grid.addWidget(groupBox4, 0, 3)
-        grid.addWidget(groupBox5, 1, 0)
-        grid.addWidget(groupBox6, 1, 1)
-        grid.addWidget(groupBox7, 1, 2)
-        grid.addWidget(groupBox8, 1, 3)
+        grid.addWidget(duration, 0, 0)
+        grid.addWidget(speed, 0, 1)
+        grid.addWidget(attitude, 0, 2)
+        grid.addWidget(altimeter, 0, 3)
+        grid.addWidget(battery, 1, 0)
+        grid.addWidget(turnSlip, 1, 1)
+        grid.addWidget(heading, 1, 2)
+        grid.addWidget(variometer, 1, 3)
         
         self.centralWidget.setLayout(grid)
         
@@ -382,11 +387,11 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
             self.speedSize = 0   
 
         self.headingIcon.setHeading(30)
-        self.speedIcon.setSpeed(12)        
+        self.speedIcon.setSpeed(self.speed[self.iteration])        
         self.altimeterIcon.setAltitude(self.alt[self.iteration])
-        self.attitudeIcon.setRoll(10*math.cos(45))
-        self.attitudeIcon.setPitch(10*math.cos(45))
-        self.variometerIcon.setClimbRate(100)
+        self.attitudeIcon.setRoll(self.roll[self.iteration])
+        self.attitudeIcon.setPitch(self.pitch[self.iteration])
+        self.variometerIcon.setClimbRate(self.vspeed[self.iteration])
         self.turnSlipIcon.setTurnRate(10*math.cos(45))
         self.turnSlipIcon.setSlipSkid(10*math.cos(45))
         self.durationIcon.setHour(self.timerEvent().hour())
@@ -405,11 +410,11 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.batteryIcon.viewUpdate.emit()
         
 
-        self.attitudeValue.setText(str(45))
-        self.speedValue.setText(str(12))
+        self.attitudeValue.setText((str(self.roll[self.iteration])))
+        self.speedValue.setText(str(self.speed[self.iteration]))
         self.batteryValue.setText(str(self.batterySize) + "%")
         self.altimeterValue.setText(str(self.alt[self.iteration]))
-        self.variometerValue.setText(str(100))
+        self.variometerValue.setText(str(self.vspeed[self.iteration]))
         self.turnSlipValue.setText(str(10*math.cos(45)))
         self.headingValue.setText(str(30))
         self.durationValue.setText(self.timerEvent().toString("hh:mm:ss"))
@@ -433,13 +438,20 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
     def takePercentage(self, percent, whole):
         return (percent * whole) / 100.0    
     def dataReader(self):
-        with self.f:
-            reader = csv.DictReader(self.f)
+        with self.f, self.h:
+            reader1 = csv.DictReader(self.f)
+            reader2 = csv.DictReader(self.h)
     
-            for row in reader:
+            for row in reader1:
                 self.lat.append(float(row['lat']))
                 self.lon.append(float(row['lon']))
                 self.alt.append(float(row['alt']))
+                self.speed.append(float(row['ground speed']))
+                self.vspeed.append(float(row['vertical speed']))
+                
+            for row in reader2:
+                self.roll.append(float(row['roll']))
+                self.pitch.append(float(row['pitch']))
                 
     def LogPrint(self):
             print("*****Location Lon*****")
