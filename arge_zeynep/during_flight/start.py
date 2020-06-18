@@ -1,14 +1,19 @@
 import sys
+import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtQml, QtQuick, QtQuickWidgets, QtWebChannel, QtWebEngineWidgets
-
-from widget.battery.RadialBar import RadialBar
-from widget.battery.BatteryWidget import BatteryWidget
 
 class Ui_MainWindow(object):
     
     def openWindow(self):
-        from main_nighttime import GUI_MainWindow
+        dark_mode_flag = False
+        hour = time.localtime().tm_hour
+        if hour < 6 | hour > 18:
+            dark_mode_flag = True
+        if (dark_mode_flag):
+            from main_nighttime import GUI_MainWindow
+        else:
+            from main_daytime import GUI_MainWindow
         window.hide()
   
     def setupUi(self, MainWindow):
@@ -21,7 +26,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)        
         
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(screenSize.width()/2.3 , screenSize.height()/2.2, 150, 60))
+        self.pushButton.setGeometry(QtCore.QRect(int(screenSize.width()/2.3) , int(screenSize.height()/2.2), 150, 60))
         self.pushButton.setObjectName("pushButton")
         
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -57,4 +62,3 @@ if __name__ == "__main__":
     ui.setupUi(window)
     window.show()
     sys.exit(app.exec_())
-
