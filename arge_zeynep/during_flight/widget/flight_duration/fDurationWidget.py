@@ -59,19 +59,19 @@ class fDuration (QGraphicsView):
         self.init()
 
     def init (self):
-        os.chdir('/Users/zeyneptuna/Desktop/during_flight/widget/flight_duration')
+        #os.chdir('/Users/zeyneptuna/Desktop/during_flight/widget/flight_duration')
         
         self.m_scaleX = self.width() / self.m_originalWidth
         self.m_scaleY = self.height() / self.m_originalHeight
                 
-        self.m_itemFace = QGraphicsSvgItem("fd_face.svg")
+        self.m_itemFace = QGraphicsSvgItem("widget/flight_duration/fd_face.svg")
         self.m_itemFace.setCacheMode(QGraphicsItem.NoCache)
         self.m_itemFace.setZValue(self.m_faceZ)
         self.m_itemFace.setTransform(QTransform.fromScale(self.m_scaleX, self.m_scaleY), True)
         self.m_itemFace.setTransformOriginPoint(self.m_originalFdCtr)
         self.m_scene.addItem(self.m_itemFace)
 
-        self.m_itemCase = QGraphicsSvgItem("fd_case.svg")        
+        self.m_itemCase = QGraphicsSvgItem("widget/flight_duration/fd_case.svg")        
         self.m_itemCase.setCacheMode(QGraphicsItem.NoCache)
         self.m_itemCase.setZValue(self.m_caseZ)
         self.m_itemCase.setTransform(QTransform.fromScale(self.m_scaleX, self.m_scaleY), True)

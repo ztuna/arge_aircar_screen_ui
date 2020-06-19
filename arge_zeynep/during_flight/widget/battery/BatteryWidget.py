@@ -58,54 +58,54 @@ class Battery(QGraphicsView):
         self.init()
         
     def init (self):
-        os.chdir('/Users/zeyneptuna/Desktop/during_flight/widget/battery')
+        # os.chdir('/Users/zeyneptuna/Desktop/during_flight/widget/battery')
         
         self.m_scaleX = self.width() / self.m_originalWidth
         self.m_scaleY = self.height() / self.m_originalHeight
     
-        self.m_itemFace = QGraphicsSvgItem("battery_face.svg")
+        self.m_itemFace = QGraphicsSvgItem("widget/battery/battery_face.svg")
         self.m_itemFace.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemFace.setZValue(self.m_faceZ)
         self.m_itemFace.setTransform(QTransform.fromScale(self.m_scaleX, self.m_scaleY), True)
         self.m_itemFace.setTransformOriginPoint(self.m_originalCtr)
         self.m_scene.addItem(self.m_itemFace)
     
-        self.m_itemCase = QGraphicsSvgItem("battery_case.svg")        
+        self.m_itemCase = QGraphicsSvgItem("widget/battery/battery_case.svg")        
         self.m_itemCase.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemCase.setZValue(self.m_caseZ)
         self.m_itemCase.setTransform(QTransform.fromScale(self.m_scaleX, self.m_scaleY), True)
         self.m_itemCase.setTransformOriginPoint(self.m_originalCtr)
         self.m_scene.addItem(self.m_itemCase)
         
-        self.m_itemMark = QGraphicsSvgItem("battery_mark.svg")
+        self.m_itemMark = QGraphicsSvgItem("widget/battery/battery_mark.svg")
         self.m_itemMark.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemMark.setZValue(self.m_markZ)
         self.m_itemMark.setPos(57, 120)
         self.m_itemMark.setScale(0.77)
         self.m_scene.addItem(self.m_itemMark)   
         
-        self.m_itemMark2 = QGraphicsSvgItem("battery_mark.svg")
+        self.m_itemMark2 = QGraphicsSvgItem("widget/battery/battery_mark.svg")
         self.m_itemMark2.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemMark2.setZValue(self.m_mark2Z)
         self.m_itemMark2.setPos(57, 92.5)
         self.m_itemMark2.setScale(0.77)
         self.m_scene.addItem(self.m_itemMark2)     
         
-        self.m_itemMark3 = QGraphicsSvgItem("battery_mark.svg")
+        self.m_itemMark3 = QGraphicsSvgItem("widget/battery/battery_mark.svg")
         self.m_itemMark3.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemMark3.setZValue(self.m_mark3Z)
         self.m_itemMark3.setPos(57, 65)
         self.m_itemMark3.setScale(0.77)
         self.m_scene.addItem(self.m_itemMark3)
         
-        self.m_itemMark4 = QGraphicsSvgItem("battery_mark.svg")
+        self.m_itemMark4 = QGraphicsSvgItem("widget/battery/battery_mark.svg")
         self.m_itemMark4.setCacheMode(QGraphicsItem.NoCache)
         self.m_itemMark4.setZValue(self.m_mark4Z)
         self.m_itemMark4.setPos(57, 37.5)
         self.m_itemMark4.setScale(0.77)
         self.m_scene.addItem(self.m_itemMark4)
         
-        self.m_itemMark5 = QGraphicsSvgItem("battery_mark.svg")
+        self.m_itemMark5 = QGraphicsSvgItem("widget/battery/battery_mark.svg")
         self.m_itemMark5.setCacheMode (QGraphicsItem.NoCache)
         self.m_itemMark5.setZValue(self.m_mark5Z)
         self.m_itemMark5.setPos(57, 10)
