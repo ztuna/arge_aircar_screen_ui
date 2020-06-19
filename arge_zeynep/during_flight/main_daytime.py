@@ -23,7 +23,6 @@ from widget.variometer import VariometerWidget
 from widget.flight_duration import fDurationWidget
 
 class GUI_MainWindow(QtWidgets.QMainWindow):
-    os.chdir(os.path.dirname(os.path.realpath("during_flight")))       
     def __init__(self, parent=None):
         super().__init__() 
         screenSize = QtWidgets.QDesktopWidget().screenGeometry(-1)
@@ -244,7 +243,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")           
         battery.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
-        # 1,2 = Heading Indicator
+        # 1,1 = Heading Indicator
         headingTitle = QLabel()
         headingTitle.setObjectName("Heading Title")
         headingTitle.setText("Heading Indicator")
@@ -281,7 +280,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
         heading.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
-        # 1,3 = Variometer
+        # 1,2 = Variometer
         variometerTitle = QLabel()
         variometerTitle.setObjectName("Variometer Title")
         variometerTitle.setText("Variometer")
@@ -342,19 +341,12 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.timeWidget.setAlignment(Qt.AlignRight | Qt.AlignTop)
         
         self.showFullScreen()        
- 
-    def speedCalculate(self):
-        speed = math.sqrt( (self.lon[self.iteration]-self.lon[self.iteration-1])**2 + (self.lat[self.iteration]-self.lat[self.iteration-1])**2  )
-        return speed
 
     def setViewWidget(self):
         self.iteration += 1
-        self.speedSize += 1
         self.batterySize -= 1
         if self.batterySize < 0:
             self.batterySize = 100
-        if self.speedSize > 16:
-            self.speedSize = 0   
 
         try:
             self.headingIcon.setHeading(self.heading[self.iteration])
@@ -460,12 +452,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
                     self.pitch.append(pitch)  
                     print(self.pitch)  
                     date = nextDate
-                                        
+                                         
     def LogPrint(self):
-            print("*****Location Lon*****")
-            #print(self.lon[self.iteration])
-            print("*****Location Lat*****")
-           # print(self.lat[self.iteration])
             print("*****Altimeter M*****")
             print(self.alt[self.iteration])
 
