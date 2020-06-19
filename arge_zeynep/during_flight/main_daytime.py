@@ -5,6 +5,7 @@ import functools
 import math
 import random
 import time
+import collections
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtQml, QtQuick, QtQuickWidgets, QtWebChannel, QtWebEngineWidgets
 
@@ -19,7 +20,6 @@ from widget.speed import SpeedWidget
 from widget.attitude import AttitudeWidget
 from widget.altimeter import AltimeterWidget
 from widget.variometer import VariometerWidget
-from widget.turn   import TurnWidget
 from widget.flight_duration import fDurationWidget
 
 class GUI_MainWindow(QtWidgets.QMainWindow):
@@ -30,17 +30,22 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.resize(screenSize.width(), screenSize.height())
         self.setStyleSheet("background-color: white")
         
-        self.iteration=0
-        self.batterySize=100        
-        self.speedSize=0
+        self.iteration = 0
+        self.batterySize = 100        
+        self.speedSize = 0
         self.latVal = 0
         self.lngVal = 0
-        self.f=open('vehicle_gps_position.csv','r')
+        self.file = open('mavlink_msg.txt','r')
 
         self.lat   = []
         self.lon   = []
         self.alt   = []
-        self.dataReader()        
+        self.speed = []
+        self.vspeed = []
+        self.roll = []
+        self.pitch = []
+        self.heading = []
+        self.dataReader()
         
         self.centralWidget = QtWidgets.QWidget(self)
         self.centralWidget.setObjectName("Central Widget")
@@ -70,7 +75,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
         self.durationValue = QLabel()
         self.durationValue.setObjectName("Attitude Value")
-        self.durationValue.setText("0:0:1")
+        self.durationValue.setText("00:00:01")
         font  = self.durationValue.font()
         font = QtGui.QFont("Roboto Slab")
         font.setPointSize(25)    
@@ -78,7 +83,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.durationValue.setStyleSheet("QLabel { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
         self.durationValue.setAlignment(Qt.AlignCenter)        
-        
+
         duration = QGroupBox()        
         durationLayout = QVBoxLayout()  
         durationLayout.addWidget(durationTitle)
@@ -87,7 +92,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         durationLayout.addStretch(1)
         duration.setLayout(durationLayout)
         duration.setStyleSheet("QGroupBox { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")
+        duration.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         # 0,1 = Air Speed Indicator
         speedTitle = QLabel()
@@ -124,6 +130,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         speed.setLayout(speedLayout)
         speed.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        speed.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         # 0,2 = Attitude Indicator
         attitudeTitle = QLabel()
@@ -160,6 +167,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         attitude.setLayout(attitudeLayout)
         attitude.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        attitude.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         # 0,3 = Altimeter
         altimeterTitle = QLabel()
@@ -196,7 +204,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         altimeter.setLayout(altimeterLayout)
         altimeter.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
-
+        altimeter.setGeometry(QtCore.QRect(300, 425, 10, 50))
+        
         # 1,0 = Remaining Battery
         batteryTitle = QLabel()
         batteryTitle.setObjectName("Battery Title")
@@ -209,6 +218,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         batteryTitle.setAlignment(Qt.AlignCenter)        
         
         self.batteryIcon = BatteryWidget.Battery(self)
+        #self.batteryIcon.resize(240, 240)
         self.batteryIcon.setObjectName("Battery Icon")
         self.batteryIcon.reinit()        
         
@@ -228,46 +238,11 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         batteryLayout.addWidget(batteryTitle)
         batteryLayout.addWidget(self.batteryIcon)
         batteryLayout.addWidget(self.batteryValue)
-        batteryLayout.addStretch(1)
+        batteryLayout.addStretch(0)
         battery.setLayout(batteryLayout)
         battery.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")           
-                
-        # 1,1 = Turn and Slip Indicator
-        turnSlipTitle = QLabel()
-        turnSlipTitle.setObjectName("TurnSlip Title")
-        turnSlipTitle.setText("Turn and Slip Indicator")
-        font  = turnSlipTitle.font()
-        font = QtGui.QFont("Roboto Slab")
-        font.setPointSize(20)    
-        turnSlipTitle.setFont(font)
-        turnSlipTitle.setPalette(palette) 
-        turnSlipTitle.setAlignment(Qt.AlignCenter)        
-
-        self.turnSlipIcon = TurnWidget.Turn(self)
-        self.turnSlipIcon.setObjectName("TurnSlip Icon")
-        self.turnSlipIcon.reinit()
-        
-        self.turnSlipValue = QLabel()
-        self.turnSlipValue.setObjectName("Attitude Value")
-        self.turnSlipValue.setText(str(1.0))
-        font  = self.turnSlipValue.font()
-        font = QtGui.QFont("Roboto Slab")
-        font.setPointSize(25)    
-        self.turnSlipValue.setFont(font)
-        self.turnSlipValue.setStyleSheet("QLabel { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(0, 0, 0); color: rgb(0, 0, 255); }")
-        self.turnSlipValue.setAlignment(Qt.AlignCenter)  
-        
-        turnSlip = QGroupBox()        
-        turnSlipLayout = QVBoxLayout()
-        turnSlipLayout.addWidget(turnSlipTitle)
-        turnSlipLayout.addWidget(self.turnSlipIcon)
-        turnSlipLayout.addWidget(self.turnSlipValue)
-        turnSlipLayout.addStretch(1)
-        turnSlip.setLayout(turnSlipLayout)
-        turnSlip.setStyleSheet("QGroupBox { background-color: \
-        rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        battery.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         # 1,2 = Heading Indicator
         headingTitle = QLabel()
@@ -304,6 +279,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         heading.setLayout(headingLayout)
         heading.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        heading.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         # 1,3 = Variometer
         variometerTitle = QLabel()
@@ -340,6 +316,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         variometer.setLayout(variometerLayout)
         variometer.setStyleSheet("QGroupBox { background-color: \
         rgb(255, 255, 255); border: 3px solid rgb(255, 255, 255); }")        
+        variometer.setGeometry(QtCore.QRect(300, 425, 10, 50))
         
         grid = QGridLayout()
         grid.addWidget(duration, 0, 0)
@@ -347,9 +324,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         grid.addWidget(attitude, 0, 2)
         grid.addWidget(altimeter, 0, 3)
         grid.addWidget(battery, 1, 0)
-        grid.addWidget(turnSlip, 1, 1)
-        grid.addWidget(heading, 1, 2)
-        grid.addWidget(variometer, 1, 3)
+        grid.addWidget(heading, 1, 1)
+        grid.addWidget(variometer, 1, 2) 
         
         self.centralWidget.setLayout(grid)
         
@@ -379,38 +355,36 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
             self.batterySize = 100
         if self.speedSize > 16:
             self.speedSize = 0   
-    
-        self.headingIcon.setHeading(30)
-        self.speedIcon.setSpeed(12)        
-        self.altimeterIcon.setAltitude(self.alt[self.iteration])
-        self.attitudeIcon.setRoll(10*math.cos(45))
-        self.attitudeIcon.setPitch(10*math.cos(45))
-        self.variometerIcon.setClimbRate(100)
-        self.turnSlipIcon.setTurnRate(10*math.cos(45))
-        self.turnSlipIcon.setSlipSkid(10*math.cos(45))
-        self.durationIcon.setHour(self.timerEvent().hour())
-        self.durationIcon.setMin(self.timerEvent().minute())
-        self.durationIcon.setSec(self.timerEvent().second())
-        self.batteryIcon.setCurrentVal(self.batterySize)
-    
+
+        try:
+            self.headingIcon.setHeading(self.heading[self.iteration])
+            self.speedIcon.setSpeed(self.speed[self.iteration])        
+            self.altimeterIcon.setAltitude(self.alt[self.iteration])
+            self.attitudeIcon.setRoll(self.roll[self.iteration])
+            self.attitudeIcon.setPitch(self.pitch[self.iteration])
+            self.variometerIcon.setClimbRate(self.vspeed[self.iteration])
+            self.durationIcon.setHour(self.timerEvent().hour())
+            self.durationIcon.setMin(self.timerEvent().minute())
+            self.durationIcon.setSec(self.timerEvent().second())
+            self.batteryIcon.setCurrentVal(self.batterySize)
+        except IndexError:
+            sys.exit()
     
         self.headingIcon.viewUpdate.emit()
         self.speedIcon.viewUpdate.emit()
         self.altimeterIcon.viewUpdate.emit()
         self.attitudeIcon.viewUpdate.emit()
         self.variometerIcon.viewUpdate.emit()
-        self.turnSlipIcon.viewUpdate.emit()
         self.durationIcon.viewUpdate.emit()
         self.batteryIcon.viewUpdate.emit()
     
     
         self.attitudeValue.setText(str(45))
-        self.speedValue.setText(str(12))
+        self.speedValue.setText(str(self.speed[self.iteration]))
         self.batteryValue.setText(str(self.batterySize) + "%")
         self.altimeterValue.setText(str(self.alt[self.iteration]))
-        self.variometerValue.setText(str(100))
-        self.turnSlipValue.setText(str(10*math.cos(45)))
-        self.headingValue.setText(str(30))
+        self.variometerValue.setText(str(self.vspeed[self.iteration]))
+        self.headingValue.setText(str(self.heading[self.iteration]))
         self.durationValue.setText(self.timerEvent().toString("hh:mm:ss"))
 
         self.LogPrint()
@@ -432,21 +406,66 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         return digitalTime
     
     def takePercentage(self, percent, whole):
-        return (percent * whole) / 100.0    
+        return (percent * whole) / 100.0 
     def dataReader(self):
-        with self.f:
-            reader = csv.DictReader(self.f)
-    
-            for row in reader:
-                self.lat.append(float(row['lat']))
-                self.lon.append(float(row['lon']))
-                self.alt.append(float(row['alt']))
-                
+        with self.file:
+            date = self.file.readline().split(',')[-2][10:-6]
+            for line in self.file:
+                nextDate = line.split(',')[-2][10:-6]
+                if nextDate == date:
+                    curAlt = 0
+                    curSpeed = 0
+                    curVSpeed = 0
+                    curHeading = 0
+                    curRoll = 0
+                    curPitch = 0            
+                    arr = line.split(',')
+                    if arr[0] == "{'mavpackettype': 'ALTITUDE'":
+                        altitude = float(arr[2].split(':')[1])
+                        if curAlt < altitude:
+                            curAlt = altitude
+                            
+                    if arr[0] == "{'mavpackettype': 'VFR_HUD'":
+                        speed = float(arr[1].split(':')[1])
+                        if curSpeed < speed:
+                            curSpeed = speed
+                                                      
+                        heading = float(arr[3].split(':')[1])
+                        if curHeading < heading:
+                            curHeading = heading
+                                                     
+                        vspeed = float(arr[6].split(':')[1].strip('}'))
+                        if curVSpeed < vspeed:
+                            curVSpeed = vspeed
+                                                   
+                    if arr[0] == "{'mavpackettype': 'ATTITUDE'":
+                        roll = float(arr[2].split(':')[1])
+                        if curRoll < roll:
+                            curRoll = roll
+                                                  
+                        pitch = float(arr[3].split(':')[1])
+                        if curPitch < pitch:
+                            curPitch = pitch
+                else:
+                    self.alt.append(altitude)
+                    print(self.alt)          
+                    self.speed.append(speed) 
+                    print(self.speed)         
+                    self.heading.append(heading) 
+                    print(self.heading)      
+                    self.vspeed.append(vspeed)  
+                    print(self.vspeed)     
+                    self.roll.append(roll)    
+                    print(self.roll)      
+                    self.pitch.append(pitch)  
+                    print(self.pitch)  
+                    date = nextDate
+                                        
     def LogPrint(self):
             print("*****Location Lon*****")
-            print(self.lon[self.iteration])
+            #print(self.lon[self.iteration])
             print("*****Location Lat*****")
-            print(self.lat[self.iteration])
+           # print(self.lat[self.iteration])
             print("*****Altimeter M*****")
             print(self.alt[self.iteration])
 
@@ -455,9 +474,9 @@ window = GUI_MainWindow()    #Main window written in pyqt5
 timer = QtCore.QTimer()
 time = QtCore.QTime(0, 0, 0)
 timer.timeout.connect(window.timerEvent)
-timer.start(200)
+timer.start(1000)
 
 timer2 = QtCore.QTimer()
 timer2.timeout.connect(window.setViewWidget)
-timer2.start(200)
+timer2.start(1000)
 window.show()
