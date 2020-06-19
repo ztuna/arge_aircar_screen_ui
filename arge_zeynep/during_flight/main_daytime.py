@@ -50,6 +50,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.centralWidget.setObjectName("Central Widget")
         self.setCentralWidget(self.centralWidget)        
         
+        self.centralWidget.setLayout(centralBox)
+
         dir_ = QtCore.QDir("Roboto_Slab")
         _id = QtGui.QFontDatabase.addApplicationFont("Roboto_Slab/RobotoSlab-SemiBold.ttf")
         
