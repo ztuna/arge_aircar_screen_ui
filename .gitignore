@@ -138,5 +138,5 @@ dmypy.json
 cython_debug/
 
 
+**/__pycache__/*.pyc
 **/.vscode/
-**/__pycache__/*
