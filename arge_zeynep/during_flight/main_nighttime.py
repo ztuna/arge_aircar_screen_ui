@@ -453,9 +453,9 @@ window = GUI_MainWindow()    #Main window written in pyqt5
 timer = QtCore.QTimer()
 time = QtCore.QTime(0, 0, 0)
 timer.timeout.connect(window.timerEvent)
-timer.start(200)
+timer.start(1000)
 
 timer2 = QtCore.QTimer()
 timer2.timeout.connect(window.setViewWidget)
-timer2.start(200)
+timer2.start(1000)
 window.show()
