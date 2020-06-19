@@ -23,7 +23,6 @@ from widget.turn   import TurnWidget
 from widget.flight_duration import fDurationWidget
 
 class GUI_MainWindow(QtWidgets.QMainWindow):
-    os.chdir(os.path.dirname(os.path.realpath("during_flight")))   
     def __init__(self, parent=None):
         super().__init__() 
         screenSize = QtWidgets.QDesktopWidget().screenGeometry(-1)
@@ -35,8 +34,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.speedSize = 0
         self.latVal = 0
         self.lngVal = 0
-        self.f = open('vehicle_gps_position_2.csv','r')
-        self.h = open('vehicle_attitude.csv','r')
+        self.file = open('mavlink_msg.txt','r')
 
         self.lat   = []
         self.lon   = []
@@ -45,6 +43,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.vspeed = []
         self.roll = []
         self.pitch = []
+        self.heading = []
         self.dataReader()        
         
         self.centralWidget = QtWidgets.QWidget(self)
@@ -236,45 +235,9 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         batteryLayout.addStretch(1)
         battery.setLayout(batteryLayout)
         battery.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")            
-                
-        # 1,1 = Turn and Slip Indicator
-        turnSlipTitle = QLabel()
-        turnSlipTitle.setObjectName("TurnSlip Title")
-        turnSlipTitle.setText("Turn and Slip Indicator")
-        font  = turnSlipTitle.font()
-        font = QtGui.QFont("Roboto Slab")
-        font.setPointSize(20)    
-        turnSlipTitle.setFont(font)
-        turnSlipTitle.setPalette(palette) 
-        turnSlipTitle.setAlignment(Qt.AlignCenter)        
-
-        self.turnSlipIcon = TurnWidget.Turn(self)
-        self.turnSlipIcon.setObjectName("TurnSlip Icon")
-        self.turnSlipIcon.reinit()
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")                  
         
-        self.turnSlipValue = QLabel()
-        self.turnSlipValue.setObjectName("Attitude Value")
-        self.turnSlipValue.setText(str(0.0))
-        font  = self.turnSlipValue.font()
-        font = QtGui.QFont("Roboto Slab")
-        font.setPointSize(25)    
-        self.turnSlipValue.setFont(font)
-        self.turnSlipValue.setStyleSheet("QLabel { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
-        self.turnSlipValue.setAlignment(Qt.AlignCenter)  
-        
-        turnSlip = QGroupBox()        
-        turnSlipLayout = QVBoxLayout()
-        turnSlipLayout.addWidget(turnSlipTitle)
-        turnSlipLayout.addWidget(self.turnSlipIcon)
-        turnSlipLayout.addWidget(self.turnSlipValue)
-        turnSlipLayout.addStretch(1)
-        turnSlip.setLayout(turnSlipLayout)
-        turnSlip.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")         
-        
-        # 1,2 = Heading Indicator
+        # 1,1 = Heading Indicator
         headingTitle = QLabel()
         headingTitle.setObjectName("Heading Title")
         headingTitle.setText("Heading Indicator")
@@ -310,7 +273,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         heading.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")          
         
-        # 1,3 = Variometer
+        # 1,2 = Variometer
         variometerTitle = QLabel()
         variometerTitle.setObjectName("Variometer Title")
         variometerTitle.setText("Variometer")
@@ -352,9 +315,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         grid.addWidget(attitude, 0, 2)
         grid.addWidget(altimeter, 0, 3)
         grid.addWidget(battery, 1, 0)
-        grid.addWidget(turnSlip, 1, 1)
-        grid.addWidget(heading, 1, 2)
-        grid.addWidget(variometer, 1, 3)
+        grid.addWidget(heading, 1, 1)
+        grid.addWidget(variometer, 1, 2) 
         
         self.centralWidget.setLayout(grid)
         
@@ -372,54 +334,45 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.timeWidget.setAlignment(Qt.AlignRight | Qt.AlignTop)
         
         self.showFullScreen()        
-        
-    def speedCalculate(self):
-        speed = math.sqrt( (self.lon[self.iteration]-self.lon[self.iteration-1])**2 + (self.lat[self.iteration]-self.lat[self.iteration-1])**2  )
-        return speed
 
     def setViewWidget(self):
         self.iteration += 1
-        self.speedSize += 1
         self.batterySize -= 1
         if self.batterySize < 0:
             self.batterySize = 100
-        if self.speedSize > 16:
-            self.speedSize = 0   
 
-        self.headingIcon.setHeading(30)
-        self.speedIcon.setSpeed(self.speed[self.iteration])        
-        self.altimeterIcon.setAltitude(self.alt[self.iteration])
-        self.attitudeIcon.setRoll(self.roll[self.iteration])
-        self.attitudeIcon.setPitch(self.pitch[self.iteration])
-        self.variometerIcon.setClimbRate(self.vspeed[self.iteration])
-        self.turnSlipIcon.setTurnRate(10*math.cos(45))
-        self.turnSlipIcon.setSlipSkid(10*math.cos(45))
-        self.durationIcon.setHour(self.timerEvent().hour())
-        self.durationIcon.setMin(self.timerEvent().minute())
-        self.durationIcon.setSec(self.timerEvent().second())
-        self.batteryIcon.setCurrentVal(self.batterySize)
-        
+        try:
+            self.headingIcon.setHeading(self.heading[self.iteration])
+            self.speedIcon.setSpeed(self.speed[self.iteration])        
+            self.altimeterIcon.setAltitude(self.alt[self.iteration])
+            self.attitudeIcon.setRoll(self.roll[self.iteration])
+            self.attitudeIcon.setPitch(self.pitch[self.iteration])
+            self.variometerIcon.setClimbRate(self.vspeed[self.iteration])
+            self.durationIcon.setHour(self.timerEvent().hour())
+            self.durationIcon.setMin(self.timerEvent().minute())
+            self.durationIcon.setSec(self.timerEvent().second())
+            self.batteryIcon.setCurrentVal(self.batterySize)
+        except IndexError:
+            sys.exit()
                 
         self.headingIcon.viewUpdate.emit()
         self.speedIcon.viewUpdate.emit()
         self.altimeterIcon.viewUpdate.emit()
         self.attitudeIcon.viewUpdate.emit()
         self.variometerIcon.viewUpdate.emit()
-        self.turnSlipIcon.viewUpdate.emit()
         self.durationIcon.viewUpdate.emit()
         self.batteryIcon.viewUpdate.emit()
         
-
-        self.attitudeValue.setText((str(self.roll[self.iteration])))
+        self.attitudeValue.setText(str(45))
         self.speedValue.setText(str(self.speed[self.iteration]))
         self.batteryValue.setText(str(self.batterySize) + "%")
         self.altimeterValue.setText(str(self.alt[self.iteration]))
         self.variometerValue.setText(str(self.vspeed[self.iteration]))
-        self.turnSlipValue.setText(str(10*math.cos(45)))
-        self.headingValue.setText(str(30))
+        self.headingValue.setText(str(self.heading[self.iteration]))
         self.durationValue.setText(self.timerEvent().toString("hh:mm:ss"))
 
         self.LogPrint()
+        
     def timerEvent(self):
         global time
         time = time.addSecs(1)
@@ -438,26 +391,60 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
     def takePercentage(self, percent, whole):
         return (percent * whole) / 100.0    
     def dataReader(self):
-        with self.f, self.h:
-            reader1 = csv.DictReader(self.f)
-            reader2 = csv.DictReader(self.h)
-    
-            for row in reader1:
-                self.lat.append(float(row['lat']))
-                self.lon.append(float(row['lon']))
-                self.alt.append(float(row['alt']))
-                self.speed.append(float(row['ground speed']))
-                self.vspeed.append(float(row['vertical speed']))
-                
-            for row in reader2:
-                self.roll.append(float(row['roll']))
-                self.pitch.append(float(row['pitch']))
+        with self.file:
+            date = self.file.readline().split(',')[-2][10:-6]
+            for line in self.file:
+                nextDate = line.split(',')[-2][10:-6]
+                if nextDate == date:
+                    curAlt = 0
+                    curSpeed = 0
+                    curVSpeed = 0
+                    curHeading = 0
+                    curRoll = 0
+                    curPitch = 0            
+                    arr = line.split(',')
+                    if arr[0] == "{'mavpackettype': 'ALTITUDE'":
+                        altitude = float(arr[2].split(':')[1])
+                        if curAlt < altitude:
+                            curAlt = altitude
+                            
+                    if arr[0] == "{'mavpackettype': 'VFR_HUD'":
+                        speed = float(arr[1].split(':')[1])
+                        if curSpeed < speed:
+                            curSpeed = speed
+                                                      
+                        heading = float(arr[3].split(':')[1])
+                        if curHeading < heading:
+                            curHeading = heading
+                                                     
+                        vspeed = float(arr[6].split(':')[1].strip('}'))
+                        if curVSpeed < vspeed:
+                            curVSpeed = vspeed
+                                                   
+                    if arr[0] == "{'mavpackettype': 'ATTITUDE'":
+                        roll = float(arr[2].split(':')[1])
+                        if curRoll < roll:
+                            curRoll = roll
+                                                  
+                        pitch = float(arr[3].split(':')[1])
+                        if curPitch < pitch:
+                            curPitch = pitch
+                else:
+                    self.alt.append(altitude)
+                    print(self.alt)          
+                    self.speed.append(speed) 
+                    print(self.speed)         
+                    self.heading.append(heading) 
+                    print(self.heading)      
+                    self.vspeed.append(vspeed)  
+                    print(self.vspeed)     
+                    self.roll.append(roll)    
+                    print(self.roll)      
+                    self.pitch.append(pitch)  
+                    print(self.pitch)  
+                    date = nextDate
                 
     def LogPrint(self):
-            print("*****Location Lon*****")
-            print(self.lon[self.iteration])
-            print("*****Location Lat*****")
-            print(self.lat[self.iteration])
             print("*****Altimeter M*****")
             print(self.alt[self.iteration])
 
