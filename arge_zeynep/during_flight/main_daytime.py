@@ -348,6 +348,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         bottomBox.addLayout(headingBox)
         bottomBox.addLayout(variometerBox)
         bottomBox.setAlignment(Qt.AlignCenter)
+
+        self.centralWidget.setLayout(centralBox)
         
         self.timeWidget = QtWidgets.QLabel(self.centralWidget)
         hPosition1 = self.takePercentage(93.75, screenSize.width())
