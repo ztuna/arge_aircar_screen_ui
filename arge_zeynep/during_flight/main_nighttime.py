@@ -25,8 +25,7 @@ from widget.flight_duration import fDurationWidget
 class GUI_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__() 
-        screenSize = QtWidgets.QDesktopWidget().screenGeometry(-1)
-        self.resize(screenSize.width(), screenSize.height())
+        self.resize(1440, 900)
         self.setStyleSheet("background-color: black")
         
         self.iteration = 0
@@ -70,6 +69,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.durationIcon = fDurationWidget.fDuration(self)
         self.durationIcon.setObjectName("Duration Icon")
+        self.durationIcon.resize(307, 327.5)        
         self.durationIcon.reinit() 
         
         self.durationValue = QLabel()
@@ -91,7 +91,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         durationLayout.addStretch(1)
         duration.setLayout(durationLayout)
         duration.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")       
+        duration.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                
         
         # 0,1 = Air Speed Indicator
         speedTitle = QLabel()
@@ -106,6 +107,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.speedIcon = SpeedWidget.qfi_SI(self)
         self.speedIcon.setObjectName("Speed Icon")
+        self.speedIcon.resize(307, 320)                
         self.speedIcon.reinit()
         
         self.speedValue = QLabel()
@@ -117,7 +119,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.speedValue.setFont(font)
         self.speedValue.setStyleSheet("QLabel { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(255, 255, 255); color: rgb(0, 255, 0); }")
-        self.speedValue.setAlignment(Qt.AlignCenter)        
+        self.speedValue.setAlignment(Qt.AlignCenter)   
         
         speed = QGroupBox()        
         speedLayout = QVBoxLayout()
@@ -127,7 +129,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         speedLayout.addStretch(1)
         speed.setLayout(speedLayout)
         speed.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")       
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }") 
+        speed.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                        
         
         # 0,2 = Attitude Indicator
         attitudeTitle = QLabel()
@@ -142,6 +145,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.attitudeIcon = AttitudeWidget.Attitude(self)
         self.attitudeIcon.setObjectName("Attitude Icon")
+        self.attitudeIcon.resize(307, 320)                
         self.attitudeIcon.reinit()
         
         self.attitudeValue = QLabel()
@@ -163,7 +167,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         attitudeLayout.addStretch(1)
         attitude.setLayout(attitudeLayout)
         attitude.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")   
+        attitude.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                
         
         # 0,3 = Altimeter
         altimeterTitle = QLabel()
@@ -178,6 +183,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.altimeterIcon = AltimeterWidget.Altimeter(self)
         self.altimeterIcon.setObjectName("Altimeter Icon")
+        self.altimeterIcon.resize(307, 318)                
         self.altimeterIcon.reinit()
         
         self.altimeterValue = QLabel()
@@ -199,7 +205,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         altimeterLayout.addStretch(1)
         altimeter.setLayout(altimeterLayout)
         altimeter.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")      
+        altimeter.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                
 
         # 1,0 = Remaining Battery
         batteryTitle = QLabel()
@@ -214,6 +221,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.batteryIcon = BatteryWidget.Battery(self)
         self.batteryIcon.setObjectName("Battery Icon")
+        self.batteryIcon.resize(307, 323)                
         self.batteryIcon.reinit()
         
         self.batteryValue = QLabel()
@@ -235,7 +243,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         batteryLayout.addStretch(1)
         battery.setLayout(batteryLayout)
         battery.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")                  
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
+        battery.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                
         
         # 1,1 = Heading Indicator
         headingTitle = QLabel()
@@ -250,6 +259,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.headingIcon = CompassWidget.qfi_HSI(self)
         self.headingIcon.setObjectName("Heading Icon")
+        self.headingIcon.resize(307, 316)            
         self.headingIcon.reinit()
         
         self.headingValue = QLabel()
@@ -271,7 +281,8 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         headingLayout.addStretch(1)
         heading.setLayout(headingLayout)
         heading.setStyleSheet("QGroupBox { background-color: \
-        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")          
+        rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")    
+        heading.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                
         
         # 1,2 = Variometer
         variometerTitle = QLabel()
@@ -286,6 +297,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
 
         self.variometerIcon = VariometerWidget.Variometer(self)
         self.variometerIcon.setObjectName("Heading Icon")
+        self.variometerIcon.resize(307, 316)                
         self.variometerIcon.reinit()
         
         self.variometerValue = QLabel()
@@ -308,22 +320,43 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         variometer.setLayout(variometerLayout)
         variometer.setStyleSheet("QGroupBox { background-color: \
         rgb(0, 0, 0); border: 3px solid rgb(0, 0, 0); }")        
+        variometer.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)                        
         
-        grid = QGridLayout()
-        grid.addWidget(duration, 0, 0)
-        grid.addWidget(speed, 0, 1)
-        grid.addWidget(attitude, 0, 2)
-        grid.addWidget(altimeter, 0, 3)
-        grid.addWidget(battery, 1, 0)
-        grid.addWidget(heading, 1, 1)
-        grid.addWidget(variometer, 1, 2) 
+        centralBox = QVBoxLayout()
+        topBox = QHBoxLayout()
+        bottomBox = QHBoxLayout()
+        centralBox.addLayout(topBox)
+        centralBox.addLayout(bottomBox)
         
-        self.centralWidget.setLayout(grid)
+        durationBox = QVBoxLayout()
+        durationBox.addWidget(duration)
+        speedBox = QVBoxLayout()
+        speedBox.addWidget(speed)
+        attitudeBox = QVBoxLayout()
+        attitudeBox.addWidget(attitude)
+        altimeterBox = QVBoxLayout()
+        altimeterBox.addWidget(altimeter)
+        batteryBox = QVBoxLayout()
+        batteryBox.addWidget(battery)
+        headingBox = QVBoxLayout()
+        headingBox.addWidget(heading)
+        variometerBox = QVBoxLayout()
+        variometerBox.addWidget(variometer)        
+        
+        topBox.addLayout(durationBox)
+        topBox.addLayout(speedBox)        
+        topBox.addLayout(attitudeBox)
+        topBox.addLayout(altimeterBox)
+        bottomBox.addLayout(batteryBox)
+        bottomBox.addLayout(headingBox)
+        bottomBox.addLayout(variometerBox)
+        bottomBox.setAlignment(Qt.AlignCenter)
+        bottomBox.setContentsMargins(195, 0, 195, 0)
+        
+        self.centralWidget.setLayout(centralBox)
         
         self.timeWidget = QtWidgets.QLabel(self.centralWidget)
-        hPosition1 = self.takePercentage(93.75, screenSize.width())
-        vPosition1 = self.takePercentage(0.5, screenSize.height())
-        self.timeWidget.setGeometry(QtCore.QRect(hPosition1, vPosition1, 80, 50))
+        self.timeWidget.setGeometry(QtCore.QRect(1350, 4.5, 80, 50))
     
         self.timeWidget.setText(self.getTime())
         font = self.timeWidget.font()
@@ -363,12 +396,12 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         self.durationIcon.viewUpdate.emit()
         self.batteryIcon.viewUpdate.emit()
         
-        self.attitudeValue.setText(str(45))
-        self.speedValue.setText(str(self.speed[self.iteration]))
+        self.attitudeValue.setText("Roll = " + str("{:.2f}".format(self.roll[self.iteration])) + ", Pitch = " + str("{:.2f}".format(self.roll[self.iteration])))
+        self.speedValue.setText(str("{:.2f}".format(self.speed[self.iteration])))
         self.batteryValue.setText(str(self.batterySize) + "%")
-        self.altimeterValue.setText(str(self.alt[self.iteration]))
-        self.variometerValue.setText(str(self.vspeed[self.iteration]))
-        self.headingValue.setText(str(self.heading[self.iteration]))
+        self.altimeterValue.setText(str("{:.2f}".format(self.alt[self.iteration])))
+        self.variometerValue.setText(str("{:.2f}".format(self.vspeed[self.iteration])))
+        self.headingValue.setText(str("{:.2f}".format(self.heading[self.iteration])))
         self.durationValue.setText(self.timerEvent().toString("hh:mm:ss"))
 
         self.LogPrint()
@@ -388,8 +421,6 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         digitalTime = hour + ":" + min
         return digitalTime
     
-    def takePercentage(self, percent, whole):
-        return (percent * whole) / 100.0    
     def dataReader(self):
         with self.file:
             date = self.file.readline().split(',')[-2][10:-6]
