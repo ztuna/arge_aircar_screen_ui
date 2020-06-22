@@ -406,7 +406,7 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
         
     def timerEvent(self):
         global time
-        time = time.addSecs(1)
+        time = time.addMSecs(200)
         return time
         
     def getTime(self):
