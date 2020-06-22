@@ -460,18 +460,12 @@ class GUI_MainWindow(QtWidgets.QMainWindow):
                         if curPitch < pitch:
                             curPitch = pitch
                 else:
-                    self.alt.append(altitude)
-                    print(self.alt)          
+                    self.alt.append(altitude)      
                     self.speed.append(speed) 
-                    print(self.speed)         
-                    self.heading.append(heading) 
-                    print(self.heading)      
-                    self.vspeed.append(vspeed)  
-                    print(self.vspeed)     
-                    self.roll.append(roll)    
-                    print(self.roll)      
-                    self.pitch.append(pitch)  
-                    print(self.pitch)  
+                    self.heading.append(heading)
+                    self.vspeed.append(vspeed)
+                    self.roll.append(roll) 
+                    self.pitch.append(pitch)
                     date = nextDate
                                       
     def LogPrint(self):
